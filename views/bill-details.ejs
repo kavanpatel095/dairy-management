@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Details</title>
+    <style>
+        /* Reset margins and paddings */
+        body,
+        ul {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 0 20px;
+            /* Added padding to body for general layout */
+        }
+
+        h1 {
+            text-align: center;
+            color: #343a40;
+            margin: 80px 0 20px;
+            /* Adjust margin-top to avoid overlap with fixed navbar */
+        }
+
+        /* Navbar styles */
+        nav {
+            background-color: #343a40;
+            color: white;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            padding: 10px 0;
+            z-index: 1000;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav ul li {
+            margin: 0 10px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            display: block;
+        }
+
+        nav ul li a:hover {
+            background-color: #495057;
+            border-radius: 5px;
+        }
+
+        /* Button styles */
+        .download-button-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .download-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .download-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Table styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            margin-bottom: 20px;
+        }
+
+        table th,
+        table td {
+            padding: 12px;
+            border: 1px solid #dee2e6;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #343a40;
+            color: white;
+        }
+
+        .total-amount {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <ul>
+            <li><a href="/home">Home</a></li>
+            <li><a href="/customers">Customers</a></li>
+            <li><a href="/products">Products</a></li>
+            <li><a href="/orders">Orders</a></li>
+            <li><a href="/orders/create">Create Order</a></li>
+            <li><a href="/bill">Bill</a></li>
+            <li><a href="/auth/logout">Logout</a></li>
+        </ul>
+    </nav>
+
+    <h1>Bill Details</h1>
+    <!-- Add a button to download the bill as PDF -->
+    <div class="download-button-container">
+        <form action="/bill/download" method="POST" target="_blank">
+            <input type="hidden" name="customer" value="<%= orders.length > 0 ? orders[0].customer._id : '' %>">
+            <input type="hidden" name="startDate" value="<%= startDate %>">
+            <input type="hidden" name="endDate" value="<%= endDate %>">
+            <button type="submit" class="download-button">Download PDF</button>
+        </form>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Sr No</th>
+                <th>Date</th>
+                <th>Customer Name</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Time</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% orders.forEach((order)=> { %>
+                <tr>
+                    <td>
+                        <%= order.customer.sr_no %>
+                    </td>
+                    <td>
+                        <%= order.date.toDateString() %>
+                    </td>
+                    <td>
+                        <%= order.customer.customer_name %>
+                    </td>
+                    <td>
+                        <%= order.product.product_name %>
+                    </td>
+                    <td>
+                        <%= order.quantity %>
+                    </td>
+                    <td>
+                        <%= order.timeOfDay %>
+                    </td>
+                    <td>$<%= order.price %>
+                    </td>
+                </tr>
+                <% }) %>
+        </tbody>
+    </table>
+    <div class="total-amount">
+        Total Amount: $<%= totalAmount %>
+    </div>
+</body>
+
+</html>

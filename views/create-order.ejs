@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Order</title>
+    <style>
+        /* Reset margins and paddings */
+        body,
+        ul {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #343a40;
+            margin-bottom: 20px;
+        }
+
+        /* Navbar styles */
+        nav {
+            background-color: #343a40;
+            color: white;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            padding: 10px 0;
+            z-index: 1000;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            padding: 0;
+        }
+
+        nav ul li {
+            margin: 0 10px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            display: block;
+        }
+
+        nav ul li a:hover {
+            background-color: #495057;
+            border-radius: 5px;
+        }
+
+        /* Form styles */
+        .content {
+            margin-top: 60px;
+            /* Adjust for fixed navbar height */
+        }
+
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        form input,
+        form select,
+        form button {
+            width: calc(100% - 22px);
+            /* Adjust width to account for padding and borders */
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+            box-sizing: border-box;
+            /* Ensure padding and border are included in the width */
+        }
+
+        form button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        form button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <ul>
+            <li><a href="/home">Home</a></li>
+            <li><a href="/customers">Customers</a></li>
+            <li><a href="/products">Products</a></li>
+            <li><a href="/orders">Orders</a></li>
+            <li><a href="/orders/create">Create Order</a></li>
+            <li><a href="/bill">Bill</a></li>
+            <li><a href="/auth/logout">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="content">
+        <h1>Create Order</h1>
+        <form method="POST" action="/orders/create">
+            <input type="date" name="date" required>
+
+            <select name="customer" required>
+                <option value="">Select Customer</option>
+
+                <% customers.forEach((customer)=> { %>
+                    <option value="<%= customer._id %>">
+                        <%= customer.customer_name %>
+                    </option>
+                    <% }) %>
+            </select>
+
+            <select name="product" required>
+                <option value="">Select Product</option>
+                <% products.forEach((product)=> { %>
+                    <option value="<%= product._id %>">
+                        <%= product.product_name %>
+                    </option>
+                    <% }) %>
+            </select>
+
+            <input type="number" name="quantity" placeholder="Enter Quantity" required>
+
+            <select name="timeOfDay" required>
+                <option value="">Select Time</option>
+
+                <option value="Morning">Morning</option>
+                <option value="Evening">Evening</option>
+            </select>
+
+            <button type="submit">Create Order</button>
+        </form>
+
+
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers</title>
+    <style>
+        /* Reset margins and paddings */
+        body,
+        ul {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #343a40;
+            margin-bottom: 20px;
+        }
+
+        /* Navbar styles */
+        nav {
+            background-color: #343a40;
+            color: white;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            padding: 10px 0;
+            z-index: 1000;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            padding: 0;
+        }
+
+        nav ul li {
+            margin: 0 10px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            display: block;
+        }
+
+        nav ul li a:hover {
+            background-color: #495057;
+            border-radius: 5px;
+        }
+
+        /* Content styles */
+        .content {
+            margin-top: 60px;
+            /* Adjust for fixed navbar height */
+        }
+
+        form {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        form input,
+        form button {
+            margin: 0 5px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+        }
+
+        form button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        form button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+        }
+
+        table th,
+        table td {
+            padding: 12px;
+            border: 1px solid #dee2e6;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #343a40;
+            color: white;
+        }
+
+        table td form {
+            display: inline-block;
+            margin: 0;
+        }
+
+        table td form input,
+        table td form button {
+            margin: 0 3px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+        }
+
+        table td form button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        table td form button:hover {
+            background-color: #c82333;
+        }
+
+        table td form button[type="submit"] {
+            background-color: #28a745;
+        }
+
+        table td form button[type="submit"]:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <ul>
+            <li><a href="/home">Home</a></li>
+            <li><a href="/customers">Customers</a></li>
+            <li><a href="/products">Products</a></li>
+            <li><a href="/orders">Orders</a></li>
+            <li><a href="/orders/create">Create Order</a></li>
+            <li><a href="/bill">Bill</a></li>
+            <li><a href="/auth/logout">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="content">
+        <h1>Customers</h1>
+
+        <% if (typeof errorMessage !=='undefined' ) { %>
+            <p style="color: red;">
+                <%= errorMessage %>
+            </p>
+            <% } %>
+
+                <form action="/customers/add" method="POST">
+                    <input type="number" name="sr_no" placeholder="Serial Number" required>
+                    <input type="text" name="customer_name" placeholder="Customer Name" required>
+                    <input type="text" name="address" placeholder="Address" required>
+                    <input type="text" name="phone_number" placeholder="Phone Number" required>
+                    <button type="submit">Add Customer</button>
+                </form>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sr No</th>
+                            <th>Name</th>
+                            <th>Address</th>
+                            <th>Phone Number</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% customers.forEach((customer)=> { %>
+                            <tr>
+                                <td>
+                                    <%= customer.sr_no %>
+                                </td>
+                                <td>
+                                    <%= customer.customer_name %>
+                                </td>
+                                <td>
+                                    <%= customer.address %>
+                                </td>
+                                <td>
+                                    <%= customer.phone_number %>
+                                </td>
+                                <td>
+                                    <form action="/customers/edit/<%= customer._id %>" method="POST">
+                                        <input type="number" name="sr_no" value="<%= customer.sr_no %>" required>
+                                        <input type="text" name="customer_name" value="<%= customer.customer_name %>"
+                                            required>
+                                        <input type="text" name="address" value="<%= customer.address %>" required>
+                                        <input type="text" name="phone_number" value="<%= customer.phone_number %>"
+                                            required>
+                                        <button type="submit">Edit</button>
+                                    </form>
+                                    <form action="/customers/delete/<%= customer._id %>" method="POST">
+                                        <button type="submit">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <% }) %>
+                    </tbody>
+                </table>
+    </div>
+</body>
+
+</html>
