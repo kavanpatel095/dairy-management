@@ -125,7 +125,7 @@
                 <option value="">Select Customer</option>
                 <% customers.forEach((customer)=> { %>
                     <option value="<%= customer._id %>">
-                        <%= customer.customer_name %>
+                        <%= customer.sr_no %> - <%= customer.customer_name %>
                     </option>
                     <% }) %>
             </select>
