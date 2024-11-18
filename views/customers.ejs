@@ -141,6 +141,9 @@
         table td form button[type="submit"]:hover {
             background-color: #218838;
         }
+        #delete {
+            background-color: #c82333;
+        }
     </style>
 </head>
 
@@ -209,7 +212,7 @@
                                         <button type="submit">Edit</button>
                                     </form>
                                     <form action="/customers/delete/<%= customer._id %>" method="POST">
-                                        <button type="submit">Delete</button>
+                                        <button id="delete" type="submit">Delete</button>
                                     </form>
                                 </td>
                             </tr>
