@@ -158,7 +158,7 @@ router.post('/download', ensureAuthenticated, async (req, res) => {
                 order.product.product_name,
                 order.quantity,
                 order.timeOfDay,
-                `$${order.price.toFixed(2)}`
+                `Rs.${order.price.toFixed(2)}`
             ];
 
             // Handle page breaks
