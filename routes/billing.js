@@ -144,7 +144,7 @@ router.post('/download', ensureAuthenticated, async (req, res) => {
                 order.product.product_name,
                 order.quantity,
                 order.timeOfDay,
-                `$${order.price.toFixed(2)}`
+                `Rs.${order.price.toFixed(2)}`
             ];
 
             row.forEach((text, i) => {
@@ -168,7 +168,7 @@ router.post('/download', ensureAuthenticated, async (req, res) => {
         // Add total amount
         currentY += 20;
         doc.fontSize(12).font('Helvetica-Bold')
-            .text(`Total Amount: $${totalAmount.toFixed(2)}`, { align: 'center' });
+            .text(`Total Amount: Rs.${totalAmount.toFixed(2)}`, { align: 'center' });
 
         // Finalize the PDF and end the stream
         doc.end();
