@@ -9,6 +9,9 @@ const path = require('path');
 const session = require('express-session');
 const passport = require('passport');
 const flash = require('connect-flash');
+const Order = require('./models/Order');
+const Customer = require('./models/Customer');
+const Product = require('./models/Product');
 
 dotenv.config();
 
@@ -72,9 +75,35 @@ app.get('/', (req, res) => {
 
 
 // Home route (protected)
-app.get('/home', ensureAuthenticated, (req, res) => {
-    res.render('home', { user: req.user }); // Pass user data if logged in
+// Home route (protected)
+app.get('/home', ensureAuthenticated, async (req, res) => {
+    try {
+        // Get total number of customers, products, and sales data
+        const totalCustomers = await Customer.countDocuments({ milkman: req.user._id });
+        const totalProducts = await Product.countDocuments({ user: req.user._id });
+
+        // Total sales and revenue
+        const orders = await Order.find({ user: req.user._id })
+            .populate('customer')
+            .populate('product')
+            .exec();
+
+        let totalSales = orders.length;
+        let totalRevenue = orders.reduce((acc, order) => acc + order.price, 0);
+
+        // Render the home page with these values
+        res.render('home', {
+            user: req.user,
+            totalCustomers,
+            totalProducts,
+            totalSales,
+            totalRevenue
+        });
+    } catch (err) {
+        res.status(500).send('Error fetching data: ' + err.message);
+    }
 });
+
 
 
 
@@ -85,11 +114,13 @@ const orderRoutes = require('./routes/orders');
 const billingRouter = require('./routes/billing');
 const authRoutes = require('./routes/auth'); // New route for authentication
 
+
 app.use('/customers', ensureAuthenticated, customerRoutes);
 app.use('/products', ensureAuthenticated, productRoutes);
 app.use('/orders', ensureAuthenticated, orderRoutes);
 app.use('/bill', ensureAuthenticated, billingRouter);
 app.use('/auth', authRoutes); // Use the auth routes
+
 
 
 
