@@ -53,6 +53,16 @@ router.post('/view', ensureAuthenticated, async (req, res) => {
 router.post('/download', ensureAuthenticated, async (req, res) => {
     try {
         const { customer, startDate, endDate } = req.body;
+
+        // Fetch customer details to include the name in the filename
+        const customerDetails = await Customer.findById(customer).exec();
+
+        if (!customerDetails) {
+            return res.status(404).send('Customer not found.');
+        }
+
+        const customerName = customerDetails.customer_name.replace(/\s+/g, '_'); // Replace spaces with underscores for filename
+
         let query = {
             customer: customer,
             date: { $gte: new Date(startDate), $lte: new Date(endDate) },
@@ -72,7 +82,9 @@ router.post('/download', ensureAuthenticated, async (req, res) => {
 
         // Create a PDF document
         const doc = new PDFDocument({ margin: 30 });
-        res.setHeader('Content-Disposition', `attachment; filename="bill_${startDate}_to_${endDate}.pdf"`);
+
+        // Updated header to include customer's name in the filename
+        res.setHeader('Content-Disposition', `attachment; filename="bill_${customerName}_${startDate}_to_${endDate}.pdf"`);
         doc.pipe(res);
 
         // Add a title
@@ -176,6 +188,5 @@ router.post('/download', ensureAuthenticated, async (req, res) => {
         res.status(500).send('Error generating PDF: ' + err.message);
     }
 });
-
 
 module.exports = router;
