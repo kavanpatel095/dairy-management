@@ -170,7 +170,7 @@
             <% } %>
 
                 <form action="/customers/add" method="POST">
-                    <input type="number" name="sr_no" placeholder="Serial Number" required>
+                    <input type="number" name="sr_no" placeholder="Serial Number" min="1" required>
                     <input type="text" name="customer_name" placeholder="Customer Name" required>
                     <input type="text" name="address" placeholder="Address" required>
                     <input type="text" name="phone_number" placeholder="Phone Number" required>
@@ -203,7 +203,7 @@
                                 </td>
                                 <td>
                                     <form action="/customers/edit/<%= customer._id %>" method="POST">
-                                        <input type="number" name="sr_no" value="<%= customer.sr_no %>" required>
+                                        <input type="number" name="sr_no" value="<%= customer.sr_no %>" min="1" required>
                                         <input type="text" name="customer_name" value="<%= customer.customer_name %>"
                                             required>
                                         <input type="text" name="address" value="<%= customer.address %>" required>
