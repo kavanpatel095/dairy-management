@@ -164,7 +164,7 @@
         <h1>Products</h1>
         <form action="/products/add" method="POST">
             <input type="text" name="product_name" placeholder="Product Name" required>
-            <input type="number" name="price" placeholder="Price" required>
+            <input type="number" name="price" placeholder="Price" min="0" required>
             <button type="submit">Add Product</button>
         </form>
         <table>
@@ -187,7 +187,7 @@
                         <td>
                             <form action="/products/edit/<%= product._id %>" method="POST">
                                 <input type="text" name="product_name" value="<%= product.product_name %>" required>
-                                <input type="number" name="price" value="<%= product.price %>" required>
+                                <input type="number" name="price" value="<%= product.price %>" min="0" required>
                                 <button type="submit">Edit</button>
                             </form>
                             <form action="/products/delete/<%= product._id %>" method="POST">
