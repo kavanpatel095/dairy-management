@@ -17,7 +17,7 @@ router.get('/', ensureAuthenticated, async (req, res) => {
         }
 
         if (timeOfDay) {
-            query.timeOfDay = timeOfDay; // Add filter for time of day
+            query.timeOfDay = timeOfDay;
         }
 
         const orders = await Order.find(query)
@@ -34,7 +34,18 @@ router.get('/', ensureAuthenticated, async (req, res) => {
             return new Date(a.date) - new Date(b.date);
         });
 
-        res.render('orders', { orders: filteredOrders, startDate, endDate, timeOfDay });
+        // Calculate total quantity and total amount
+        const totalQuantity = filteredOrders.reduce((sum, order) => sum + order.quantity, 0);
+        const totalAmount = filteredOrders.reduce((sum, order) => sum + order.price, 0);
+
+        res.render('orders', {
+            orders: filteredOrders,
+            startDate,
+            endDate,
+            timeOfDay,
+            totalQuantity,
+            totalAmount
+        });
     } catch (err) {
         res.status(500).send('Error retrieving orders: ' + err.message);
     }
@@ -111,6 +122,10 @@ router.post('/download', ensureAuthenticated, async (req, res) => {
             return new Date(a.date) - new Date(b.date);
         });
 
+        // Calculate total quantity and total amount
+        const totalQuantity = filteredOrders.reduce((sum, order) => sum + order.quantity, 0);
+        const totalAmount = filteredOrders.reduce((sum, order) => sum + order.price, 0);
+
         // Create PDF document
         const doc = new PDFDocument({ margin: 30 });
         res.setHeader('Content-Disposition', `attachment; filename="filtered_orders_${startDate}_to_${endDate}.pdf"`);
@@ -177,7 +192,19 @@ router.post('/download', ensureAuthenticated, async (req, res) => {
             currentY += 20;
         });
 
+        // Add totals section
+        if (currentY + 40 > doc.page.height - doc.page.margins.bottom) {
+            doc.addPage();
+            currentY = doc.page.margins.top;
+        }
 
+        doc.moveDown(2);
+        doc.fontSize(12).font('Helvetica-Bold').text(`Total Quantity: ${totalQuantity}`, {
+            align: 'right'
+        });
+        doc.text(`Total Amount: Rs.${totalAmount.toFixed(2)}`, {
+            align: 'right'
+        });
 
         // Finalize the PDF and end the stream
         doc.end();
