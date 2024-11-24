@@ -38,18 +38,30 @@ router.get('/', ensureAuthenticated, async (req, res) => {
         const totalQuantity = filteredOrders.reduce((sum, order) => sum + order.quantity, 0);
         const totalAmount = filteredOrders.reduce((sum, order) => sum + order.price, 0);
 
+        // Calculate total quantity for each product
+        const productQuantities = {};
+        filteredOrders.forEach(order => {
+            const productName = order.product.product_name;
+            if (!productQuantities[productName]) {
+                productQuantities[productName] = 0;
+            }
+            productQuantities[productName] += order.quantity;
+        });
+
         res.render('orders', {
             orders: filteredOrders,
             startDate,
             endDate,
             timeOfDay,
             totalQuantity,
-            totalAmount
+            totalAmount,
+            productQuantities
         });
     } catch (err) {
         res.status(500).send('Error retrieving orders: ' + err.message);
     }
 });
+
 
 
 
@@ -95,9 +107,14 @@ router.post('/delete/:id', ensureAuthenticated, async (req, res) => {
     }
 });
 
+//PDF Download
 router.post('/download', ensureAuthenticated, async (req, res) => {
     try {
         const { startDate, endDate, timeOfDay } = req.body;
+
+        // Debug log
+        console.log("Starting PDF generation...");
+
         let query = { user: req.user._id };
 
         if (startDate && endDate) {
@@ -125,6 +142,17 @@ router.post('/download', ensureAuthenticated, async (req, res) => {
         // Calculate total quantity and total amount
         const totalQuantity = filteredOrders.reduce((sum, order) => sum + order.quantity, 0);
         const totalAmount = filteredOrders.reduce((sum, order) => sum + order.price, 0);
+
+        // Calculate product-wise quantities
+        const productQuantities = filteredOrders.reduce((quantities, order) => {
+            const productName = order.product.product_name;
+            if (quantities[productName]) {
+                quantities[productName] += order.quantity;
+            } else {
+                quantities[productName] = order.quantity;
+            }
+            return quantities;
+        }, {});
 
         // Create PDF document
         const doc = new PDFDocument({ margin: 30 });
@@ -192,25 +220,45 @@ router.post('/download', ensureAuthenticated, async (req, res) => {
             currentY += 20;
         });
 
-        // Add totals section
-        if (currentY + 40 > doc.page.height - doc.page.margins.bottom) {
+        // Add totals and product-wise quantities section (aligned to leftmost corner)
+        if (currentY + 80 > doc.page.height - doc.page.margins.bottom) {
             doc.addPage();
             currentY = doc.page.margins.top;
         }
 
         doc.moveDown(2);
-        doc.fontSize(12).font('Helvetica-Bold').text(`Total Quantity: ${totalQuantity}`, {
-            align: 'right'
-        });
-        doc.text(`Total Amount: Rs.${totalAmount.toFixed(2)}`, {
-            align: 'right'
+        doc.fontSize(12).font('Helvetica-Bold');
+
+        // Add totals section
+        doc.text(`Total Quantity: ${totalQuantity}`, { align: 'left' });
+        doc.text(`Total Amount: Rs.${totalAmount.toFixed(2)}`, { align: 'left' });
+
+        // Move to the next line
+        doc.moveDown(2);
+
+        // Add product-wise quantities section with left alignment
+        doc.text('Product-wise Quantities:', { underline: true, align: 'left' });
+
+        doc.moveDown(1);
+
+        Object.entries(productQuantities).forEach(([productName, quantity]) => {
+            doc.text(`${productName}: ${quantity}`, { align: 'left' });
+            doc.moveDown(1);
         });
 
         // Finalize the PDF and end the stream
         doc.end();
+
+        // Debug log
+        console.log("PDF generation completed successfully!");
+
     } catch (err) {
+        // Log the error and return a response
+        console.error('Error generating PDF:', err);
         res.status(500).send('Error generating PDF: ' + err.message);
     }
 });
+
+
 
 module.exports = router;
